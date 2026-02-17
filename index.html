@@ -1,0 +1,1746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DSA Pattern Mastery</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --border: #1e1e2e;
+  --accent1: #00ff88;
+  --accent2: #ff6b35;
+  --accent3: #7c3aed;
+  --accent4: #06b6d4;
+  --text: #e2e8f0;
+  --muted: #64748b;
+  --glow1: rgba(0,255,136,0.15);
+  --glow2: rgba(255,107,53,0.15);
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+  cursor: none;
+}
+
+/* Custom Cursor */
+.cursor {
+  width: 12px; height: 12px;
+  background: var(--accent1);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9999;
+  transition: transform 0.1s;
+  mix-blend-mode: screen;
+}
+.cursor-trail {
+  width: 30px; height: 30px;
+  border: 1px solid var(--accent1);
+  border-radius: 50%;
+  position: fixed;
+  pointer-events: none;
+  z-index: 9998;
+  transition: all 0.15s ease;
+  opacity: 0.4;
+}
+
+/* Grid Background */
+body::before {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: 
+    linear-gradient(rgba(0,255,136,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0,255,136,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  padding: 2rem;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.hero-blob {
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  filter: blur(120px);
+  pointer-events: none;
+  animation: blobMove 8s ease-in-out infinite;
+}
+.blob1 { background: var(--glow1); top: -100px; left: -100px; }
+.blob2 { background: var(--glow2); bottom: -100px; right: -100px; animation-delay: -4s; }
+
+@keyframes blobMove {
+  0%,100% { transform: translate(0,0) scale(1); }
+  50% { transform: translate(30px, 20px) scale(1.05); }
+}
+
+.badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(0,255,136,0.1);
+  border: 1px solid rgba(0,255,136,0.3);
+  color: var(--accent1);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  padding: 6px 16px;
+  border-radius: 100px;
+  margin-bottom: 2rem;
+  animation: fadeDown 0.6s ease both;
+}
+.badge::before { content: '●'; animation: pulse 1.5s ease-in-out infinite; }
+@keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.2} }
+
+.hero h1 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2.5rem, 8vw, 6rem);
+  font-weight: 800;
+  line-height: 0.95;
+  margin-bottom: 1.5rem;
+  animation: fadeDown 0.6s 0.1s ease both;
+}
+.hero h1 span { color: var(--accent1); display: block; }
+.hero h1 em { color: var(--accent2); font-style: normal; }
+
+.hero p {
+  max-width: 560px;
+  color: var(--muted);
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin: 0 auto 2.5rem;
+  animation: fadeDown 0.6s 0.2s ease both;
+}
+
+.stats-row {
+  display: flex; gap: 2rem;
+  margin-bottom: 3rem;
+  animation: fadeDown 0.6s 0.3s ease both;
+}
+.stat {
+  text-align: center;
+}
+.stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--accent1);
+}
+.stat-label { font-size: 0.75rem; color: var(--muted); letter-spacing: 0.1em; text-transform: uppercase; }
+
+.scroll-hint {
+  position: absolute; bottom: 2rem;
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+  color: var(--muted); font-size: 0.75rem;
+  animation: fadeDown 1s 0.5s ease both;
+}
+.scroll-line {
+  width: 1px; height: 40px;
+  background: linear-gradient(to bottom, var(--accent1), transparent);
+  animation: scrollLine 2s ease-in-out infinite;
+}
+@keyframes scrollLine { 0%{opacity:0;transform:scaleY(0);transform-origin:top} 50%{opacity:1} 100%{opacity:0;transform:scaleY(1)} }
+
+@keyframes fadeDown {
+  from { opacity:0; transform: translateY(-20px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+/* Search */
+.search-section {
+  position: relative; z-index: 1;
+  padding: 0 2rem 4rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.search-wrap {
+  position: relative;
+}
+.search-icon {
+  position: absolute; left: 1.2rem; top: 50%; transform: translateY(-50%);
+  color: var(--accent1); font-size: 1.1rem;
+}
+#search {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 1rem;
+  padding: 1rem 1rem 1rem 3rem;
+  border-radius: 12px;
+  outline: none;
+  transition: border-color 0.3s, box-shadow 0.3s;
+}
+#search:focus {
+  border-color: var(--accent1);
+  box-shadow: 0 0 0 3px rgba(0,255,136,0.1);
+}
+#search::placeholder { color: var(--muted); }
+
+/* Category Tabs */
+.tabs-section {
+  position: relative; z-index: 1;
+  padding: 0 2rem 3rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+.tabs {
+  display: flex; flex-wrap: wrap; gap: 0.5rem;
+  margin-bottom: 3rem;
+}
+.tab {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.72rem;
+  padding: 8px 16px;
+  border-radius: 100px;
+  cursor: pointer;
+  transition: all 0.25s;
+  white-space: nowrap;
+}
+.tab:hover, .tab.active {
+  border-color: var(--accent1);
+  color: var(--accent1);
+  background: rgba(0,255,136,0.08);
+}
+
+/* Pattern Cards Grid */
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1.5rem;
+}
+
+.category-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: border-color 0.3s, transform 0.3s;
+  animation: cardIn 0.5s ease both;
+}
+.category-block:hover {
+  border-color: var(--accent1);
+  transform: translateY(-4px);
+}
+
+@keyframes cardIn {
+  from { opacity:0; transform: translateY(30px); }
+  to { opacity:1; transform: translateY(0); }
+}
+
+.cat-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 1.2rem;
+}
+.cat-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+.cat-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.cat-count {
+  margin-left: auto;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  color: var(--muted);
+  background: var(--bg);
+  padding: 3px 10px;
+  border-radius: 100px;
+  border: 1px solid var(--border);
+}
+
+.patterns-list {
+  display: flex; flex-direction: column; gap: 0.4rem;
+}
+
+.pattern-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.6rem 0.8rem;
+  border-radius: 8px;
+  transition: background 0.2s;
+  gap: 10px;
+}
+.pattern-item:hover { background: rgba(255,255,255,0.04); }
+
+.pattern-name {
+  font-size: 0.88rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+.pattern-links {
+  display: flex; gap: 6px;
+  flex-shrink: 0;
+}
+.link-btn {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-decoration: none;
+  border: 1px solid;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.link-btn.lc {
+  color: #ffa116;
+  border-color: rgba(255,161,22,0.3);
+  background: rgba(255,161,22,0.05);
+}
+.link-btn.lc:hover { background: rgba(255,161,22,0.15); }
+.link-btn.gfg {
+  color: #2f8d46;
+  border-color: rgba(47,141,70,0.3);
+  background: rgba(47,141,70,0.05);
+}
+.link-btn.gfg:hover { background: rgba(47,141,70,0.15); }
+
+/* Signals Table Section */
+.signals-section {
+  position: relative; z-index: 1;
+  padding: 4rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.section-heading {
+  font-family: 'Syne', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+.section-heading span { color: var(--accent2); }
+.section-sub {
+  color: var(--muted);
+  margin-bottom: 2.5rem;
+  font-size: 1rem;
+}
+
+.signals-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+.signal-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.2rem;
+  display: flex; align-items: center; justify-content: space-between;
+  transition: all 0.25s;
+  gap: 1rem;
+}
+.signal-card:hover {
+  border-color: var(--accent2);
+  background: rgba(255,107,53,0.04);
+}
+.signal-keyword {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.8rem;
+  color: var(--accent4);
+  background: rgba(6,182,212,0.1);
+  border: 1px solid rgba(6,182,212,0.2);
+  padding: 4px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+.signal-arrow { color: var(--muted); font-size: 1rem; }
+.signal-pattern {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--accent2);
+  text-align: right;
+}
+
+/* Roadmap Section */
+.roadmap-section {
+  position: relative; z-index: 1;
+  padding: 4rem 2rem;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.roadmap {
+  position: relative;
+  padding-left: 2.5rem;
+}
+.roadmap::before {
+  content: '';
+  position: absolute; left: 10px; top: 0; bottom: 0;
+  width: 2px;
+  background: linear-gradient(to bottom, var(--accent1), var(--accent3), var(--accent2));
+}
+
+.roadmap-item {
+  position: relative;
+  margin-bottom: 2rem;
+  animation: fadeRight 0.5s ease both;
+}
+@keyframes fadeRight { from{opacity:0;transform:translateX(-20px)} to{opacity:1;transform:translateX(0)} }
+
+.roadmap-dot {
+  position: absolute;
+  left: -2.5rem;
+  top: 4px;
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  border: 2px solid var(--accent1);
+  background: var(--bg);
+  display: flex; align-items: center; justify-content: center;
+}
+.roadmap-dot::after {
+  content: '';
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--accent1);
+}
+
+.roadmap-label {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--accent1);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.roadmap-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.roadmap-desc {
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+/* Footer */
+footer {
+  position: relative; z-index: 1;
+  text-align: center;
+  padding: 3rem 2rem;
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Space Mono', monospace;
+  font-size: 0.75rem;
+}
+footer span { color: var(--accent1); }
+
+/* Hidden */
+.hidden { display: none !important; }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+/* Glow accent line */
+.divider {
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--accent1), transparent);
+  opacity: 0.3;
+  margin: 2rem 0;
+}
+
+<!-- /*============================================================
+     /* 🔥 COMPETITIVE PROGRAMMING ADD-ON SECTION
+     
+     KAHAN LAGAO: Apni index.html mein ye line dhundo:
+     
+         <footer>
+     
+     Us line se BILKUL PEHLE ye poora block paste karo.
+     Bas itna hi — kuch aur nahi chhuna. 
+     ============================================================ */-->
+
+
+
+
+.cp-section {
+  position: relative; z-index: 1;
+  padding: 5rem 2rem;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.cp-hero-banner {
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a0a2e 50%, #0a1628 100%);
+  border: 1px solid rgba(124,58,237,0.4);
+  border-radius: 24px;
+  padding: 3rem;
+  margin-bottom: 3rem;
+  position: relative;
+  overflow: hidden;
+  text-align: center;
+}
+.cp-hero-banner::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: 
+    radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.15) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 50%, rgba(244,63,94,0.1) 0%, transparent 60%);
+  pointer-events: none;
+}
+.cp-warning-badge {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(244,63,94,0.15);
+  border: 1px solid rgba(244,63,94,0.4);
+  color: #f43f5e;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  padding: 6px 16px;
+  border-radius: 100px;
+  margin-bottom: 1.5rem;
+  letter-spacing: 0.1em;
+}
+.cp-hero-banner h2 {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.8rem, 5vw, 3.5rem);
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 1rem;
+}
+.cp-hero-banner h2 .grad {
+  background: linear-gradient(135deg, #7c3aed, #f43f5e, #ff6b35);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.cp-hero-banner p {
+  color: #94a3b8;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+.cp-stats {
+  display: flex; justify-content: center; gap: 3rem;
+  margin-top: 2rem;
+  flex-wrap: wrap;
+}
+.cp-stat-num {
+  font-family: 'Syne', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: #a78bfa;
+}
+.cp-stat-label {
+  font-size: 0.7rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+/* Difficulty Filter */
+.cp-filters {
+  display: flex; gap: 0.5rem; flex-wrap: wrap;
+  margin-bottom: 2rem;
+}
+.cp-filter-btn {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.7rem;
+  padding: 7px 18px;
+  border-radius: 100px;
+  border: 1px solid;
+  cursor: pointer;
+  transition: all 0.25s;
+  background: transparent;
+}
+.cp-filter-btn[data-diff="all"] { border-color: #7c3aed; color: #a78bfa; }
+.cp-filter-btn[data-diff="hard"] { border-color: rgba(244,63,94,0.4); color: #f43f5e; }
+.cp-filter-btn[data-diff="medium"] { border-color: rgba(251,191,36,0.4); color: #fbbf24; }
+.cp-filter-btn[data-diff="expert"] { border-color: rgba(124,58,237,0.4); color: #7c3aed; }
+.cp-filter-btn.active, .cp-filter-btn:hover { 
+  background: rgba(124,58,237,0.15);
+  border-color: #7c3aed;
+  color: #a78bfa;
+}
+
+/* CP Grid */
+.cp-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  gap: 1.5rem;
+}
+
+.cp-card {
+  background: #0d0d1a;
+  border: 1px solid rgba(124,58,237,0.2);
+  border-radius: 16px;
+  padding: 1.5rem;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+.cp-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(to right, #7c3aed, #f43f5e);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.cp-card:hover {
+  border-color: rgba(124,58,237,0.6);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(124,58,237,0.1);
+}
+.cp-card:hover::before { opacity: 1; }
+
+.cp-card-header {
+  display: flex; align-items: center; gap: 12px;
+  margin-bottom: 1.2rem;
+}
+.cp-card-icon {
+  width: 42px; height: 42px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+.cp-card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+}
+.cp-card-count {
+  margin-left: auto;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  color: #64748b;
+  background: #111118;
+  padding: 3px 10px;
+  border-radius: 100px;
+  border: 1px solid #1e1e2e;
+}
+
+.diff-badge {
+  display: inline-flex;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  padding: 2px 8px;
+  border-radius: 4px;
+  margin-left: 8px;
+  letter-spacing: 0.05em;
+}
+.diff-hard { background: rgba(244,63,94,0.15); color: #f43f5e; border: 1px solid rgba(244,63,94,0.3); }
+.diff-medium { background: rgba(251,191,36,0.1); color: #fbbf24; border: 1px solid rgba(251,191,36,0.25); }
+.diff-expert { background: rgba(124,58,237,0.15); color: #a78bfa; border: 1px solid rgba(124,58,237,0.3); }
+
+.cp-pattern-item {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0.55rem 0.7rem;
+  border-radius: 8px;
+  transition: background 0.2s;
+  gap: 8px;
+}
+.cp-pattern-item:hover { background: rgba(124,58,237,0.08); }
+.cp-pattern-name {
+  font-size: 0.87rem;
+  font-weight: 500;
+  flex: 1;
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* Combination Patterns Section */
+.combo-section {
+  margin-top: 4rem;
+}
+.combo-heading {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.8rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+}
+.combo-heading span { color: #f43f5e; }
+.combo-sub { color: #64748b; font-size: 0.9rem; margin-bottom: 2rem; }
+
+.combo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 1rem;
+}
+.combo-card {
+  background: #0d0d1a;
+  border: 1px solid rgba(244,63,94,0.2);
+  border-radius: 12px;
+  padding: 1.2rem 1.4rem;
+  transition: all 0.25s;
+  display: flex; flex-direction: column; gap: 10px;
+}
+.combo-card:hover {
+  border-color: rgba(244,63,94,0.5);
+  background: rgba(244,63,94,0.04);
+}
+.combo-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  display: flex; align-items: center; gap: 8px;
+}
+.combo-pills {
+  display: flex; flex-wrap: wrap; gap: 6px;
+}
+.combo-pill {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  padding: 3px 10px;
+  border-radius: 100px;
+  background: rgba(124,58,237,0.12);
+  border: 1px solid rgba(124,58,237,0.25);
+  color: #a78bfa;
+}
+.combo-example {
+  font-size: 0.8rem;
+  color: #64748b;
+  font-style: italic;
+}
+.combo-links {
+  display: flex; gap: 6px;
+}
+
+/* CF Badge */
+.cf-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-decoration: none;
+  border: 1px solid rgba(255,107,53,0.3);
+  color: #ff6b35;
+  background: rgba(255,107,53,0.05);
+  transition: all 0.2s;
+}
+.cf-badge:hover { background: rgba(255,107,53,0.15); }
+.link-btn.cf {
+  color: #ff6b35;
+  border-color: rgba(255,107,53,0.3);
+  background: rgba(255,107,53,0.05);
+}
+.link-btn.cf:hover { background: rgba(255,107,53,0.15); }
+
+
+
+/* <!-- ============================================================
+     👤 CREATOR CARD ADD-ON
+     
+     KAHAN LAGAO:
+     
+     Apni index.html mein ye exact line dhundo:
+         <footer>
+     
+     Us line se BILKUL PEHLE ye poora block paste karo.
+     Bas itna hi — kuch aur nahi chhuna.
+     ============================================================ --> */
+
+
+
+/* ===== CREATOR CARD ===== */
+.creator-section {
+  position: relative; z-index: 1;
+  padding: 4rem 2rem;
+  display: flex;
+  justify-content: center;
+}
+
+.creator-card {
+  position: relative;
+  background: #0d0d1a;
+  border: 1px solid rgba(124,58,237,0.25);
+  border-radius: 24px;
+  padding: 2.5rem 3rem;
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+  max-width: 680px;
+  width: 100%;
+  overflow: hidden;
+  transition: border-color 0.3s, transform 0.3s;
+}
+.creator-card:hover {
+  border-color: rgba(0,255,136,0.4);
+  transform: translateY(-4px);
+}
+
+/* Glow blob inside card */
+.creator-card::before {
+  content: '';
+  position: absolute;
+  width: 300px; height: 300px;
+  background: radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%);
+  top: -80px; right: -80px;
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+/* Photo */
+.creator-avatar-wrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.creator-avatar {
+  width: 90px; height: 90px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(0,255,136,0.4);
+  display: block;
+}
+.creator-online-dot {
+  position: absolute;
+  bottom: 4px; right: 4px;
+  width: 14px; height: 14px;
+  background: #00ff88;
+  border-radius: 50%;
+  border: 2px solid #0d0d1a;
+  animation: onlinePulse 2s ease-in-out infinite;
+}
+@keyframes onlinePulse {
+  0%,100% { box-shadow: 0 0 0 0 rgba(0,255,136,0.4); }
+  50% { box-shadow: 0 0 0 6px rgba(0,255,136,0); }
+}
+
+/* Info */
+.creator-info { flex: 1; }
+
+.creator-tag {
+  font-family: 'Space Mono', monospace;
+  font-size: 0.65rem;
+  color: #00ff88;
+  background: rgba(0,255,136,0.08);
+  border: 1px solid rgba(0,255,136,0.2);
+  padding: 3px 10px;
+  border-radius: 100px;
+  letter-spacing: 0.1em;
+  display: inline-block;
+  margin-bottom: 0.6rem;
+}
+
+.creator-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 0.3rem;
+}
+
+.creator-role {
+  font-size: 0.85rem;
+  color: #64748b;
+  margin-bottom: 1.2rem;
+}
+.creator-role span {
+  color: #a78bfa;
+}
+
+/* Social Links */
+.creator-socials {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.creator-social-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.68rem;
+  padding: 6px 12px;
+  border-radius: 8px;
+  text-decoration: none;
+  border: 1px solid;
+  transition: all 0.2s;
+  letter-spacing: 0.03em;
+}
+
+.social-github {
+  color: #e2e8f0;
+  border-color: rgba(226,232,240,0.2);
+  background: rgba(226,232,240,0.04);
+}
+.social-github:hover {
+  background: rgba(226,232,240,0.1);
+  border-color: rgba(226,232,240,0.5);
+}
+
+.social-linkedin {
+  color: #60a5fa;
+  border-color: rgba(96,165,250,0.25);
+  background: rgba(96,165,250,0.05);
+}
+.social-linkedin:hover {
+  background: rgba(96,165,250,0.15);
+  border-color: rgba(96,165,250,0.5);
+}
+
+.social-instagram {
+  color: #f472b6;
+  border-color: rgba(244,114,182,0.25);
+  background: rgba(244,114,182,0.05);
+}
+.social-instagram:hover {
+  background: rgba(244,114,182,0.15);
+  border-color: rgba(244,114,182,0.5);
+}
+
+/* Made with love tag */
+.creator-made {
+  position: absolute;
+  top: 1.2rem; right: 1.5rem;
+  font-family: 'Space Mono', monospace;
+  font-size: 0.6rem;
+  color: #1e1e2e;
+  letter-spacing: 0.1em;
+  background: rgba(255,255,255,0.03);
+  padding: 3px 8px;
+  border-radius: 4px;
+  border: 1px solid #1e1e2e;
+}
+
+/* Mobile responsive */
+@media (max-width: 560px) {
+  .creator-card {
+    flex-direction: column;
+    text-align: center;
+    padding: 2rem 1.5rem;
+    gap: 1.5rem;
+  }
+  .creator-socials { justify-content: center; }
+  .creator-tag { display: block; text-align: center; }
+}
+
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-trail" id="cursorTrail"></div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-blob blob1"></div>
+  <div class="hero-blob blob2"></div>
+  <div class="badge">Final Year Placement Mode 🚀</div>
+  <h1>
+    <span>DSA Pattern</span>
+    <em>Mastery</em>
+  </h1>
+  <p>Story → Signal → Pattern → Algorithm. Learn to recognize patterns, not memorize solutions. Practice links included for every pattern.</p>
+  <div class="stats-row">
+    <div class="stat"><div class="stat-num" id="totalPatterns">0</div><div class="stat-label">Patterns</div></div>
+    <div class="stat"><div class="stat-num" id="totalSignals">0</div><div class="stat-label">Signals</div></div>
+    <div class="stat"><div class="stat-num">14</div><div class="stat-label">Categories</div></div>
+  </div>
+  <div class="scroll-hint">
+    <span>SCROLL</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- SEARCH -->
+<div class="search-section">
+  <div class="search-wrap">
+    <span class="search-icon">⌕</span>
+    <input type="text" id="search" placeholder="Search patterns, signals, algorithms...">
+  </div>
+</div>
+
+<!-- PATTERNS -->
+<section class="tabs-section" id="patternsSection">
+  <h2 class="section-heading">Pattern <span>Library</span></h2>
+  <p class="section-sub">Click any pattern → Practice on LeetCode or GFG</p>
+  <div class="tabs" id="tabs"></div>
+  <div class="grid" id="grid"></div>
+</section>
+
+<div class="divider" style="max-width:1400px;margin:0 auto 2rem;"></div>
+
+<!-- SIGNALS TABLE -->
+<section class="signals-section">
+  <h2 class="section-heading">Hidden Signal <span style="color:var(--accent2)">Decoder</span></h2>
+  <p class="section-sub">Question mein ye words dikhein → Ye pattern use karo</p>
+  <div class="signals-grid" id="signalsGrid"></div>
+</section>
+
+<div class="divider" style="max-width:900px;margin:0 auto 2rem;"></div>
+
+<!-- ROADMAP -->
+<section class="roadmap-section">
+  <h2 class="section-heading">Your <span style="color:var(--accent3)">Roadmap</span></h2>
+  <p class="section-sub">Step by step placement preparation path</p>
+  <div class="roadmap" id="roadmap"></div>
+</section>
+
+<!-- ============================================================
+     HTML SECTION — <footer> se PEHLE paste karo
+     ============================================================ -->
+
+
+<div class="divider" style="max-width:1400px;margin:0 auto 2rem;"></div>
+
+<section class="cp-section" id="cpSection">
+
+  <!-- Hero Banner -->
+  <div class="cp-hero-banner">
+    <div class="cp-warning-badge">⚠️ HARD WORKERS ONLY — COMPETITIVE PROGRAMMING ZONE</div>
+    <h2>
+      Advanced <span class="grad">Competitive</span><br>Programming Patterns
+    </h2>
+    <p>This section is for those who want to crack FAANG Hard or Codeforces Div 1.
+Even after placements, you will need to come back here.</p>
+    <div class="cp-stats">
+      <div>
+        <div class="cp-stat-num" id="cpTotalPatterns">0</div>
+        <div class="cp-stat-label">Advanced Patterns</div>
+      </div>
+      <div>
+        <div class="cp-stat-num" id="cpTotalCombos">0</div>
+        <div class="cp-stat-label">Combinations</div>
+      </div>
+      <div>
+        <div class="cp-stat-num">6</div>
+        <div class="cp-stat-label">Categories</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="cp-filters">
+    <button class="cp-filter-btn active" data-diff="all">All</button>
+    <button class="cp-filter-btn" data-diff="medium">🟡 Medium-Hard</button>
+    <button class="cp-filter-btn" data-diff="hard">🔴 Hard</button>
+    <button class="cp-filter-btn" data-diff="expert">💀 Expert</button>
+  </div>
+
+  <!-- CP Grid -->
+  <div class="cp-grid" id="cpGrid"></div>
+
+  <!-- Combination Patterns -->
+  <div class="combo-section">
+    <h2 class="combo-heading">Pattern <span>Combinations</span> — The Real Interview Traps</h2>
+    <p class="combo-sub">Ye wahi questions hain jo beginners ko stun kar dete hain — ek se zyada pattern ek saath</p>
+    <div class="combo-grid" id="comboGrid"></div>
+  </div>
+
+</section>
+
+
+
+<!-- STEP 2: HTML — <footer> se BILKUL PEHLE paste karo -->
+
+<div class="divider" style="max-width:900px;margin:0 auto 0;"></div>
+
+<section class="creator-section">
+  <div class="creator-card">
+
+    <div class="creator-made">MADE WITH 🤍</div>
+
+    <!-- Photo: GitHub se automatic aayegi -->
+    <div class="creator-avatar-wrap">
+      <img
+        class="creator-avatar"
+        src="https://avatars.githubusercontent.com/ashwanil23"
+        alt="Ashwani Kumar"
+        onerror="this.src='https://ui-avatars.com/api/?name=Ashwani+Kumar&background=7c3aed&color=fff&size=90'"
+      />
+      <div class="creator-online-dot"></div>
+    </div>
+
+    <!-- Info -->
+    <div class="creator-info">
+      <div class="creator-tag">// CREATED BY</div>
+      <div class="creator-name">Ashwani Kumar</div>
+      <div class="creator-role">Android Dev · <span>CS Student</span> · India 🇮🇳</div>
+
+      <div class="creator-socials">
+
+        <a class="creator-social-link social-github"
+           href="https://github.com/ashwanil23"
+           target="_blank" rel="noopener">
+          <!-- GitHub SVG -->
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          GitHub
+        </a>
+
+        <a class="creator-social-link social-linkedin"
+           href="https://linkedin.com/in/ashwanl23"
+           target="_blank" rel="noopener">
+          <!-- LinkedIn SVG -->
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
+          LinkedIn
+        </a>
+
+        <a class="creator-social-link social-instagram"
+           href="https://instagram.com/ashwani.l23"
+           target="_blank" rel="noopener">
+          <!-- Instagram SVG -->
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 1 0 0 12.324 6.162 6.162 0 0 0 0-12.324zM12 16a4 4 0 1 1 0-8 4 4 0 0 1 0 8zm6.406-11.845a1.44 1.44 0 1 0 0 2.881 1.44 1.44 0 0 0 0-2.881z"/>
+          </svg>
+          Instagram
+        </a>
+
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer>
+  <span>DSA Pattern Mastery</span> — Solve on LeetCode / GFG. Master the patterns here. 🔥
+</footer>
+
+<script>
+// Cursor
+const cursor = document.getElementById('cursor');
+const trail = document.getElementById('cursorTrail');
+let mx=0, my=0, tx=0, ty=0;
+document.addEventListener('mousemove', e => { mx=e.clientX; my=e.clientY; cursor.style.left=mx-6+'px'; cursor.style.top=my-6+'px'; });
+setInterval(()=>{ tx+=(mx-tx)*0.15; ty+=(my-ty)*0.15; trail.style.left=tx-15+'px'; trail.style.top=ty-15+'px'; }, 16);
+
+// DATA
+const categories = [
+  {
+    id: 'array', label: '🟢 Array', color: '#00ff88',
+    patterns: [
+      { name: 'Prefix Sum', lc: 'https://leetcode.com/tag/prefix-sum/', gfg: 'https://www.geeksforgeeks.org/prefix-sum-array-implementation-applications-competitive-programming/' },
+      { name: 'Suffix Sum', lc: 'https://leetcode.com/problems/sum-of-subarray-ranges/', gfg: 'https://www.geeksforgeeks.org/suffix-sum-array/' },
+      { name: 'Difference Array', lc: 'https://leetcode.com/problems/car-pooling/', gfg: 'https://www.geeksforgeeks.org/difference-array-range-update-query-o1/' },
+      { name: "Kadane's Algorithm", lc: 'https://leetcode.com/problems/maximum-subarray/', gfg: 'https://www.geeksforgeeks.org/largest-sum-contiguous-subarray/' },
+      { name: 'Two Pointer', lc: 'https://leetcode.com/tag/two-pointers/', gfg: 'https://www.geeksforgeeks.org/two-pointers-technique/' },
+      { name: 'Sliding Window (Fixed)', lc: 'https://leetcode.com/problems/maximum-average-subarray-i/', gfg: 'https://www.geeksforgeeks.org/window-sliding-technique/' },
+      { name: 'Sliding Window (Variable)', lc: 'https://leetcode.com/problems/longest-substring-without-repeating-characters/', gfg: 'https://www.geeksforgeeks.org/variable-length-subarrays-using-sliding-window/' },
+      { name: 'Dutch National Flag', lc: 'https://leetcode.com/problems/sort-colors/', gfg: 'https://www.geeksforgeeks.org/dutch-national-flag-algorithm/' },
+      { name: "Moore's Voting Algorithm", lc: 'https://leetcode.com/problems/majority-element/', gfg: 'https://www.geeksforgeeks.org/boyer-moore-majority-voting-algorithm/' },
+      { name: 'Binary Search on Answer', lc: 'https://leetcode.com/problems/koko-eating-bananas/', gfg: 'https://www.geeksforgeeks.org/binary-search-on-answer/' },
+      { name: 'Merge Intervals', lc: 'https://leetcode.com/problems/merge-intervals/', gfg: 'https://www.geeksforgeeks.org/merging-intervals/' },
+      { name: 'Cyclic Sort', lc: 'https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/', gfg: 'https://www.geeksforgeeks.org/cyclic-sort/' },
+      { name: 'In-place Rearrangement', lc: 'https://leetcode.com/problems/next-permutation/', gfg: 'https://www.geeksforgeeks.org/rearrange-array-arrj-becomes-arri-j/' },
+    ]
+  },
+  {
+    id: 'string', label: '🟡 String', color: '#fbbf24',
+    patterns: [
+      { name: 'KMP Algorithm', lc: 'https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/', gfg: 'https://www.geeksforgeeks.org/kmp-algorithm-for-pattern-searching/' },
+      { name: 'Rabin-Karp', lc: 'https://leetcode.com/problems/repeated-string-match/', gfg: 'https://www.geeksforgeeks.org/rabin-karp-algorithm-for-pattern-searching/' },
+      { name: "Manacher's Algorithm", lc: 'https://leetcode.com/problems/longest-palindromic-substring/', gfg: 'https://www.geeksforgeeks.org/manachers-algorithm-linear-time-longest-palindromic-substring-part-1/' },
+      { name: 'Z Algorithm', lc: 'https://leetcode.com/problems/find-the-index-of-the-first-occurrence-in-a-string/', gfg: 'https://www.geeksforgeeks.org/z-algorithm-linear-time-pattern-searching-algorithm/' },
+      { name: 'Anagram / Freq Counter', lc: 'https://leetcode.com/problems/valid-anagram/', gfg: 'https://www.geeksforgeeks.org/check-whether-two-strings-are-anagram-of-each-other/' },
+      { name: 'Minimum Window Substring', lc: 'https://leetcode.com/problems/minimum-window-substring/', gfg: 'https://www.geeksforgeeks.org/find-the-smallest-window-in-a-string-containing-all-characters-of-another-string/' },
+      { name: 'Palindrome Expansion', lc: 'https://leetcode.com/problems/palindromic-substrings/', gfg: 'https://www.geeksforgeeks.org/count-palindrome-sub-strings-string/' },
+      { name: 'Rolling Hash', lc: 'https://leetcode.com/problems/distinct-echo-substrings/', gfg: 'https://www.geeksforgeeks.org/rolling-hash-practice-problems/' },
+    ]
+  },
+  {
+    id: 'linkedlist', label: '🔵 Linked List', color: '#60a5fa',
+    patterns: [
+      { name: "Floyd's Cycle Detection", lc: 'https://leetcode.com/problems/linked-list-cycle/', gfg: 'https://www.geeksforgeeks.org/floyds-cycle-detection-algorithm/' },
+      { name: 'Fast & Slow Pointer', lc: 'https://leetcode.com/problems/middle-of-the-linked-list/', gfg: 'https://www.geeksforgeeks.org/slow-and-fast-pointer-approach-in-linked-list/' },
+      { name: 'Reverse Linked List', lc: 'https://leetcode.com/problems/reverse-linked-list/', gfg: 'https://www.geeksforgeeks.org/reverse-a-linked-list/' },
+      { name: 'Reverse in K Groups', lc: 'https://leetcode.com/problems/reverse-nodes-in-k-group/', gfg: 'https://www.geeksforgeeks.org/reverse-a-list-in-groups-of-given-size/' },
+      { name: 'Merge K Lists (Heap)', lc: 'https://leetcode.com/problems/merge-k-sorted-lists/', gfg: 'https://www.geeksforgeeks.org/merge-k-sorted-linked-lists/' },
+      { name: 'Partition List', lc: 'https://leetcode.com/problems/partition-list/', gfg: 'https://www.geeksforgeeks.org/partitioning-a-linked-list-around-a-given-value/' },
+      { name: 'Clone with Random Pointer', lc: 'https://leetcode.com/problems/copy-list-with-random-pointer/', gfg: 'https://www.geeksforgeeks.org/clone-linked-list-next-arbit-pointer-set-2/' },
+    ]
+  },
+  {
+    id: 'stack', label: '🟠 Stack', color: '#fb923c',
+    patterns: [
+      { name: 'Monotonic Stack (Increasing)', lc: 'https://leetcode.com/problems/daily-temperatures/', gfg: 'https://www.geeksforgeeks.org/monotonic-stack/' },
+      { name: 'Next Greater Element', lc: 'https://leetcode.com/problems/next-greater-element-i/', gfg: 'https://www.geeksforgeeks.org/next-greater-element/' },
+      { name: 'Previous Smaller Element', lc: 'https://leetcode.com/problems/largest-rectangle-in-histogram/', gfg: 'https://www.geeksforgeeks.org/previous-smaller-element/' },
+      { name: 'Histogram Largest Rectangle', lc: 'https://leetcode.com/problems/largest-rectangle-in-histogram/', gfg: 'https://www.geeksforgeeks.org/largest-rectangle-under-histogram/' },
+      { name: 'Trapping Rainwater', lc: 'https://leetcode.com/problems/trapping-rain-water/', gfg: 'https://www.geeksforgeeks.org/trapping-rain-water/' },
+      { name: 'Expression Evaluation', lc: 'https://leetcode.com/problems/basic-calculator/', gfg: 'https://www.geeksforgeeks.org/expression-evaluation/' },
+      { name: 'Min Stack Pattern', lc: 'https://leetcode.com/problems/min-stack/', gfg: 'https://www.geeksforgeeks.org/design-a-stack-that-supports-getmin-in-o1-time-and-o1-extra-space/' },
+    ]
+  },
+  {
+    id: 'heap', label: '🔴 Heap', color: '#f87171',
+    patterns: [
+      { name: 'Top K Elements', lc: 'https://leetcode.com/problems/top-k-frequent-elements/', gfg: 'https://www.geeksforgeeks.org/k-largestor-smallest-elements-in-an-array/' },
+      { name: 'Kth Largest/Smallest', lc: 'https://leetcode.com/problems/kth-largest-element-in-an-array/', gfg: 'https://www.geeksforgeeks.org/kth-smallestlargest-element-unsorted-array/' },
+      { name: 'Merge K Sorted Arrays', lc: 'https://leetcode.com/problems/merge-k-sorted-lists/', gfg: 'https://www.geeksforgeeks.org/merge-k-sorted-arrays/' },
+      { name: 'Median in Data Stream', lc: 'https://leetcode.com/problems/find-median-from-data-stream/', gfg: 'https://www.geeksforgeeks.org/median-of-stream-of-integers-running-integers/' },
+      { name: 'Frequency Based Heap', lc: 'https://leetcode.com/problems/top-k-frequent-words/', gfg: 'https://www.geeksforgeeks.org/find-k-most-frequent-elements/' },
+      { name: 'Task Scheduling (Heap)', lc: 'https://leetcode.com/problems/task-scheduler/', gfg: 'https://www.geeksforgeeks.org/task-scheduler/' },
+    ]
+  },
+  {
+    id: 'binarysearch', label: '🟣 Binary Search', color: '#a78bfa',
+    patterns: [
+      { name: 'Classic Binary Search', lc: 'https://leetcode.com/problems/binary-search/', gfg: 'https://www.geeksforgeeks.org/binary-search/' },
+      { name: 'Lower / Upper Bound', lc: 'https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/', gfg: 'https://www.geeksforgeeks.org/implement-lower_bound-and-upper_bound-in-c/' },
+      { name: 'Search in Rotated Array', lc: 'https://leetcode.com/problems/search-in-rotated-sorted-array/', gfg: 'https://www.geeksforgeeks.org/search-an-element-in-a-sorted-and-pivoted-array/' },
+      { name: 'Peak Element', lc: 'https://leetcode.com/problems/find-peak-element/', gfg: 'https://www.geeksforgeeks.org/find-a-peak-in-a-given-array/' },
+      { name: 'BS on Answer (Allocate Books)', lc: 'https://leetcode.com/problems/split-array-largest-sum/', gfg: 'https://www.geeksforgeeks.org/allocate-minimum-number-of-pages/' },
+      { name: 'Aggressive Cows Pattern', lc: 'https://leetcode.com/problems/magnetic-force-between-two-balls/', gfg: 'https://www.geeksforgeeks.org/aggressive-cows/' },
+      { name: 'Search in 2D Matrix', lc: 'https://leetcode.com/problems/search-a-2d-matrix/', gfg: 'https://www.geeksforgeeks.org/search-in-row-wise-and-column-wise-sorted-matrix/' },
+    ]
+  },
+  {
+    id: 'backtracking', label: '🌀 Backtracking', color: '#34d399',
+    patterns: [
+      { name: 'Subsets Generation', lc: 'https://leetcode.com/problems/subsets/', gfg: 'https://www.geeksforgeeks.org/backtracking-to-find-all-subsets/' },
+      { name: 'Permutations', lc: 'https://leetcode.com/problems/permutations/', gfg: 'https://www.geeksforgeeks.org/write-a-c-program-to-print-all-permutations-of-a-given-string/' },
+      { name: 'Combination Sum', lc: 'https://leetcode.com/problems/combination-sum/', gfg: 'https://www.geeksforgeeks.org/combinational-sum/' },
+      { name: 'N-Queens', lc: 'https://leetcode.com/problems/n-queens/', gfg: 'https://www.geeksforgeeks.org/n-queen-problem-backtracking-3/' },
+      { name: 'Sudoku Solver', lc: 'https://leetcode.com/problems/sudoku-solver/', gfg: 'https://www.geeksforgeeks.org/sudoku-backtracking-7/' },
+      { name: 'Word Search', lc: 'https://leetcode.com/problems/word-search/', gfg: 'https://www.geeksforgeeks.org/search-a-word-in-a-2d-grid-of-characters/' },
+      { name: 'Palindrome Partitioning', lc: 'https://leetcode.com/problems/palindrome-partitioning/', gfg: 'https://www.geeksforgeeks.org/given-a-string-print-all-possible-palindromic-partition/' },
+    ]
+  },
+  {
+    id: 'tree', label: '🌳 Tree', color: '#4ade80',
+    patterns: [
+      { name: 'DFS Traversals (Pre/In/Post)', lc: 'https://leetcode.com/problems/binary-tree-inorder-traversal/', gfg: 'https://www.geeksforgeeks.org/tree-traversals-inorder-preorder-and-postorder/' },
+      { name: 'Level Order (BFS)', lc: 'https://leetcode.com/problems/binary-tree-level-order-traversal/', gfg: 'https://www.geeksforgeeks.org/level-order-tree-traversal/' },
+      { name: 'Zigzag Traversal', lc: 'https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/', gfg: 'https://www.geeksforgeeks.org/zigzag-tree-traversal/' },
+      { name: 'Diameter of Tree', lc: 'https://leetcode.com/problems/diameter-of-binary-tree/', gfg: 'https://www.geeksforgeeks.org/diameter-of-a-binary-tree/' },
+      { name: 'LCA (Lowest Common Ancestor)', lc: 'https://leetcode.com/problems/lowest-common-ancestor-of-a-binary-tree/', gfg: 'https://www.geeksforgeeks.org/lowest-common-ancestor-binary-tree-set-1/' },
+      { name: 'BST Validation & KthSmallest', lc: 'https://leetcode.com/problems/kth-smallest-element-in-a-bst/', gfg: 'https://www.geeksforgeeks.org/find-k-th-smallest-element-in-bst-order-statistics-in-bst/' },
+      { name: 'Serialize / Deserialize Tree', lc: 'https://leetcode.com/problems/serialize-and-deserialize-binary-tree/', gfg: 'https://www.geeksforgeeks.org/serialize-deserialize-binary-tree/' },
+      { name: 'Tree DP', lc: 'https://leetcode.com/problems/house-robber-iii/', gfg: 'https://www.geeksforgeeks.org/dp-on-trees/' },
+      { name: 'Vertical Order Traversal', lc: 'https://leetcode.com/problems/vertical-order-traversal-of-a-binary-tree/', gfg: 'https://www.geeksforgeeks.org/print-binary-tree-vertical-order/' },
+    ]
+  },
+  {
+    id: 'graph', label: '🕸 Graph', color: '#06b6d4',
+    patterns: [
+      { name: 'DFS / BFS', lc: 'https://leetcode.com/problems/number-of-islands/', gfg: 'https://www.geeksforgeeks.org/breadth-first-search-or-bfs-for-a-graph/' },
+      { name: 'Topological Sort (Kahn\'s)', lc: 'https://leetcode.com/problems/course-schedule/', gfg: 'https://www.geeksforgeeks.org/topological-sorting-indegree-based-solution/' },
+      { name: 'Union Find (DSU)', lc: 'https://leetcode.com/problems/number-of-provinces/', gfg: 'https://www.geeksforgeeks.org/union-find/' },
+      { name: 'Dijkstra\'s Shortest Path', lc: 'https://leetcode.com/problems/network-delay-time/', gfg: 'https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/' },
+      { name: 'Bellman Ford', lc: 'https://leetcode.com/problems/cheapest-flights-within-k-stops/', gfg: 'https://www.geeksforgeeks.org/bellman-ford-algorithm-dp-23/' },
+      { name: 'Floyd Warshall', lc: 'https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/', gfg: 'https://www.geeksforgeeks.org/floyd-warshall-algorithm-dp-16/' },
+      { name: "Prim's MST", lc: 'https://leetcode.com/problems/min-cost-to-connect-all-points/', gfg: 'https://www.geeksforgeeks.org/prims-minimum-spanning-tree-mst-greedy-algo-5/' },
+      { name: "Kruskal's MST", lc: 'https://leetcode.com/problems/min-cost-to-connect-all-points/', gfg: 'https://www.geeksforgeeks.org/kruskals-minimum-spanning-tree-algorithm-greedy-algo-2/' },
+      { name: 'Bipartite Check', lc: 'https://leetcode.com/problems/is-graph-bipartite/', gfg: 'https://www.geeksforgeeks.org/bipartite-graph/' },
+      { name: "Kosaraju's / Tarjan's SCC", lc: 'https://leetcode.com/problems/critical-connections-in-a-network/', gfg: 'https://www.geeksforgeeks.org/strongly-connected-components/' },
+      { name: 'Multi-source BFS', lc: 'https://leetcode.com/problems/walls-and-gates/', gfg: 'https://www.geeksforgeeks.org/multi-source-shortest-path-in-unweighted-graph/' },
+      { name: '0-1 BFS', lc: 'https://leetcode.com/problems/minimum-cost-to-make-at-least-one-valid-path-in-a-grid/', gfg: 'https://www.geeksforgeeks.org/0-1-bfs-shortest-path-binary-graph/' },
+    ]
+  },
+  {
+    id: 'dp', label: '💎 Dynamic Programming', color: '#e879f9',
+    patterns: [
+      { name: '1D DP', lc: 'https://leetcode.com/problems/climbing-stairs/', gfg: 'https://www.geeksforgeeks.org/dynamic-programming/' },
+      { name: '2D DP / Grid DP', lc: 'https://leetcode.com/problems/unique-paths/', gfg: 'https://www.geeksforgeeks.org/count-all-possible-paths-top-left-bottom-right-nxm-matrix/' },
+      { name: '0/1 Knapsack', lc: 'https://leetcode.com/problems/partition-equal-subset-sum/', gfg: 'https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/' },
+      { name: 'Unbounded Knapsack', lc: 'https://leetcode.com/problems/coin-change/', gfg: 'https://www.geeksforgeeks.org/unbounded-knapsack-repetition-items-allowed/' },
+      { name: 'LIS (Longest Increasing Subsequence)', lc: 'https://leetcode.com/problems/longest-increasing-subsequence/', gfg: 'https://www.geeksforgeeks.org/longest-increasing-subsequence-dp-3/' },
+      { name: 'LCS (Longest Common Subsequence)', lc: 'https://leetcode.com/problems/longest-common-subsequence/', gfg: 'https://www.geeksforgeeks.org/longest-common-subsequence-dp-4/' },
+      { name: 'Edit Distance', lc: 'https://leetcode.com/problems/edit-distance/', gfg: 'https://www.geeksforgeeks.org/edit-distance-dp-5/' },
+      { name: 'Partition DP (MCM)', lc: 'https://leetcode.com/problems/burst-balloons/', gfg: 'https://www.geeksforgeeks.org/matrix-chain-multiplication-dp-8/' },
+      { name: 'Bitmask DP', lc: 'https://leetcode.com/problems/shortest-path-visiting-all-nodes/', gfg: 'https://www.geeksforgeeks.org/bitmask-dp/' },
+      { name: 'DP on Trees', lc: 'https://leetcode.com/problems/house-robber-iii/', gfg: 'https://www.geeksforgeeks.org/dp-on-trees/' },
+      { name: 'Digit DP', lc: 'https://leetcode.com/problems/count-digit-one/', gfg: 'https://www.geeksforgeeks.org/digit-dp-introduction/' },
+      { name: 'State Machine DP', lc: 'https://leetcode.com/problems/best-time-to-buy-and-sell-stock-with-cooldown/', gfg: 'https://www.geeksforgeeks.org/stock-buy-sell/' },
+      { name: 'Space Optimized DP', lc: 'https://leetcode.com/problems/house-robber/', gfg: 'https://www.geeksforgeeks.org/space-optimization-using-dp/' },
+    ]
+  },
+  {
+    id: 'greedy', label: '⚡ Greedy', color: '#fde047',
+    patterns: [
+      { name: 'Activity Selection', lc: 'https://leetcode.com/problems/non-overlapping-intervals/', gfg: 'https://www.geeksforgeeks.org/activity-selection-problem-greedy-algo-1/' },
+      { name: 'Jump Game', lc: 'https://leetcode.com/problems/jump-game/', gfg: 'https://www.geeksforgeeks.org/jump-game/' },
+      { name: 'Fractional Knapsack', lc: 'https://leetcode.com/problems/maximum-units-on-a-truck/', gfg: 'https://www.geeksforgeeks.org/fractional-knapsack-problem/' },
+      { name: 'Job Sequencing', lc: 'https://leetcode.com/problems/task-scheduler/', gfg: 'https://www.geeksforgeeks.org/job-sequencing-problem/' },
+      { name: 'Greedy with Sorting', lc: 'https://leetcode.com/problems/assign-cookies/', gfg: 'https://www.geeksforgeeks.org/greedy-algorithms/' },
+      { name: 'Gas Station Problem', lc: 'https://leetcode.com/problems/gas-station/', gfg: 'https://www.geeksforgeeks.org/find-a-tour-that-visits-all-stations/' },
+    ]
+  },
+  {
+    id: 'bits', label: '💡 Bit Manipulation', color: '#fdba74',
+    patterns: [
+      { name: 'XOR Trick / Single Number', lc: 'https://leetcode.com/problems/single-number/', gfg: 'https://www.geeksforgeeks.org/find-element-appears-array-every-element-appears-twice/' },
+      { name: 'Power of Two Check', lc: 'https://leetcode.com/problems/power-of-two/', gfg: 'https://www.geeksforgeeks.org/program-to-find-whether-a-given-number-is-power-of-2/' },
+      { name: 'Count Set Bits', lc: 'https://leetcode.com/problems/number-of-1-bits/', gfg: 'https://www.geeksforgeeks.org/count-set-bits-in-an-integer/' },
+      { name: 'Bitmask Subsets', lc: 'https://leetcode.com/problems/subsets/', gfg: 'https://www.geeksforgeeks.org/bit-manipulation-to-find-subsets/' },
+      { name: 'Submask Enumeration', lc: 'https://leetcode.com/problems/maximum-students-taking-exam/', gfg: 'https://www.geeksforgeeks.org/bitmask-dp/' },
+    ]
+  },
+  {
+    id: 'advanced', label: '🔥 Advanced', color: '#f43f5e',
+    patterns: [
+      { name: 'Segment Tree', lc: 'https://leetcode.com/problems/range-sum-query-mutable/', gfg: 'https://www.geeksforgeeks.org/segment-tree-set-1-sum-of-given-range/' },
+      { name: 'Fenwick Tree (BIT)', lc: 'https://leetcode.com/problems/range-sum-query-mutable/', gfg: 'https://www.geeksforgeeks.org/binary-indexed-tree-or-fenwick-tree-2/' },
+      { name: 'Trie', lc: 'https://leetcode.com/problems/implement-trie-prefix-tree/', gfg: 'https://www.geeksforgeeks.org/trie-insert-and-search/' },
+      { name: 'Sparse Table (RMQ)', lc: 'https://leetcode.com/problems/range-minimum-query/', gfg: 'https://www.geeksforgeeks.org/sparse-table/' },
+      { name: 'Divide & Conquer', lc: 'https://leetcode.com/tag/divide-and-conquer/', gfg: 'https://www.geeksforgeeks.org/divide-and-conquer/' },
+      { name: 'Meet in the Middle', lc: 'https://leetcode.com/problems/partition-array-into-two-arrays-to-minimize-sum-difference/', gfg: 'https://www.geeksforgeeks.org/meet-in-the-middle/' },
+      { name: 'Sieve of Eratosthenes', lc: 'https://leetcode.com/problems/count-primes/', gfg: 'https://www.geeksforgeeks.org/sieve-of-eratosthenes/' },
+      { name: 'Matrix Exponentiation', lc: 'https://leetcode.com/problems/fibonacci-number/', gfg: 'https://www.geeksforgeeks.org/matrix-exponentiation/' },
+    ]
+  }
+];
+
+const signals = [
+  { keyword: '"contiguous subarray"', pattern: 'Sliding Window / Prefix Sum' },
+  { keyword: '"subarray sum = k"', pattern: 'Prefix Sum + HashMap' },
+  { keyword: '"minimum steps"', pattern: 'BFS' },
+  { keyword: '"shortest path" (unweighted)', pattern: 'BFS' },
+  { keyword: '"shortest path" (weighted)', pattern: 'Dijkstra' },
+  { keyword: '"negative weights"', pattern: 'Bellman Ford' },
+  { keyword: '"maximum subarray"', pattern: "Kadane's Algorithm" },
+  { keyword: '"kth largest/smallest"', pattern: 'Heap (Min/Max)' },
+  { keyword: '"count ways"', pattern: 'Dynamic Programming' },
+  { keyword: '"subset sum"', pattern: 'Backtracking / Knapsack DP' },
+  { keyword: '"cycle detection"', pattern: 'Union Find / DFS' },
+  { keyword: '"range query"', pattern: 'Segment Tree / Prefix Sum' },
+  { keyword: '"maximize/minimize answer"', pattern: 'Binary Search on Answer' },
+  { keyword: '"topological order"', pattern: 'Topo Sort (Kahn\'s)' },
+  { keyword: '"merge intervals"', pattern: 'Sort + Greedy' },
+  { keyword: '"next greater element"', pattern: 'Monotonic Stack' },
+  { keyword: '"valid parentheses"', pattern: 'Stack' },
+  { keyword: '"palindrome"', pattern: "Manacher's / Two Pointer" },
+  { keyword: '"longest common"', pattern: 'LCS (DP)' },
+  { keyword: '"longest increasing"', pattern: 'LIS (DP / BinarySearch)' },
+  { keyword: '"edit / transform string"', pattern: 'Edit Distance DP' },
+  { keyword: '"generate all permutations"', pattern: 'Backtracking' },
+  { keyword: '"graph coloring / bipartite"', pattern: 'BFS Coloring' },
+  { keyword: '"minimum spanning tree"', pattern: "Prim's / Kruskal's" },
+  { keyword: '"connected components"', pattern: 'DFS / Union Find' },
+  { keyword: '"majority element"', pattern: "Moore's Voting" },
+  { keyword: '"missing number 1..n"', pattern: 'Cyclic Sort / XOR' },
+  { keyword: '"find duplicate in array"', pattern: "Floyd's Cycle Detection" },
+  { keyword: '"rotate array"', pattern: 'Reversal Algorithm' },
+  { keyword: '"matrix path count"', pattern: '2D Grid DP' },
+  { keyword: '"level order"', pattern: 'BFS Tree' },
+  { keyword: '"stock profit"', pattern: 'DP / Greedy (State Machine)' },
+  { keyword: '"coin change"', pattern: 'Unbounded Knapsack DP' },
+  { keyword: '"wildcard / regex"', pattern: 'DP 2D' },
+  { keyword: '"serialize tree"', pattern: 'DFS / BFS Preorder' },
+  { keyword: '"single source all paths"', pattern: 'Dijkstra / Bellman Ford' },
+  { keyword: '"strongly connected"', pattern: "Kosaraju's / Tarjan's" },
+  { keyword: '"single number XOR"', pattern: 'Bit Manipulation' },
+  { keyword: '"prefix product / suffix"', pattern: 'Prefix/Suffix Array' },
+  { keyword: '"schedule tasks / cooldown"', pattern: 'Heap + Greedy' },
+];
+
+const roadmapItems = [
+  { phase: 'Phase 01', title: 'Master Basic Patterns', desc: 'Sliding Window, Two Pointer, Prefix Sum, Binary Search. Ye foundation hai. Inke bina kuch nahi.' },
+  { phase: 'Phase 02', title: 'Stack, Queue & Heap', desc: 'Monotonic Stack, Priority Queue patterns. Top K, Next Greater Element, Task Scheduling.' },
+  { phase: 'Phase 03', title: 'Tree & Graph Traversals', desc: 'DFS, BFS, Topological Sort, Union Find. Ye patterns 30% interviews cover karte hain.' },
+  { phase: 'Phase 04', title: 'Dynamic Programming Core', desc: 'Knapsack, LIS, LCS, Edit Distance. Har DP ko pattern se dekho — Choice + Optimal Substructure.' },
+  { phase: 'Phase 05', title: 'Advanced Graph Algorithms', desc: 'Dijkstra, Bellman Ford, Prim/Kruskal, SCC. Weighted graphs ka full package.' },
+  { phase: 'Phase 06', title: 'Signal Detection Practice', desc: '50 random questions lo. Code mat likho. Sirf pattern identify karo. Ye skill sabse important hai.' },
+  { phase: 'Phase 07', title: 'Pattern Combination Drill', desc: 'Sliding Window + HashMap, BFS + DP, Binary Search + Greedy. Mixed patterns crack karna seekho.' },
+  { phase: 'Phase 08', title: 'Mock Interviews', desc: 'Daily 2-3 unseen LeetCode medium/hard. Pehle pattern identify karo, phir code likho. Track your pattern accuracy.' },
+];
+
+// Render Tabs
+const tabsEl = document.getElementById('tabs');
+const allTab = document.createElement('button');
+allTab.className = 'tab active';
+allTab.textContent = 'All';
+allTab.dataset.cat = 'all';
+tabsEl.appendChild(allTab);
+categories.forEach(c => {
+  const t = document.createElement('button');
+  t.className = 'tab';
+  t.textContent = c.label;
+  t.dataset.cat = c.id;
+  tabsEl.appendChild(t);
+});
+
+// Render Grid
+function renderGrid(filter='', catFilter='all') {
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  let totalVisible = 0;
+  categories.forEach((cat, ci) => {
+    if(catFilter !== 'all' && catFilter !== cat.id) return;
+    const filtered = cat.patterns.filter(p => p.name.toLowerCase().includes(filter.toLowerCase()));
+    if(!filtered.length) return;
+    totalVisible += filtered.length;
+    const block = document.createElement('div');
+    block.className = 'category-block';
+    block.style.animationDelay = ci*0.05+'s';
+    block.style.borderColor = 'var(--border)';
+    block.addEventListener('mouseenter', ()=> block.style.borderColor = cat.color);
+    block.addEventListener('mouseleave', ()=> block.style.borderColor = 'var(--border)');
+    block.innerHTML = `
+      <div class="cat-header">
+        <div class="cat-icon" style="background:${cat.color}18;color:${cat.color}">${cat.label.split(' ')[0]}</div>
+        <div class="cat-title" style="color:${cat.color}">${cat.label.replace(/^[^ ]+ /,'')}</div>
+        <div class="cat-count">${filtered.length} patterns</div>
+      </div>
+      <div class="patterns-list"></div>
+    `;
+    const list = block.querySelector('.patterns-list');
+    filtered.forEach(p => {
+      const item = document.createElement('div');
+      item.className = 'pattern-item';
+      item.innerHTML = `
+        <span class="pattern-name">${p.name}</span>
+        <div class="pattern-links">
+          <a class="link-btn lc" href="${p.lc}" target="_blank" rel="noopener">LC ↗</a>
+          <a class="link-btn gfg" href="${p.gfg}" target="_blank" rel="noopener">GFG ↗</a>
+        </div>
+      `;
+      list.appendChild(item);
+    });
+    grid.appendChild(block);
+  });
+  return totalVisible;
+}
+
+// Render Signals
+function renderSignals(filter='') {
+  const grid = document.getElementById('signalsGrid');
+  grid.innerHTML = '';
+  signals.filter(s=>!filter||s.keyword.toLowerCase().includes(filter)||s.pattern.toLowerCase().includes(filter)).forEach((s,i)=>{
+    const card = document.createElement('div');
+    card.className = 'signal-card';
+    card.style.animationDelay = i*0.02+'s';
+    card.innerHTML = `
+      <span class="signal-keyword">${s.keyword}</span>
+      <span class="signal-arrow">→</span>
+      <span class="signal-pattern">${s.pattern}</span>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// Render Roadmap
+const rm = document.getElementById('roadmap');
+roadmapItems.forEach((r,i) => {
+  const item = document.createElement('div');
+  item.className = 'roadmap-item';
+  item.style.animationDelay = i*0.08+'s';
+  item.innerHTML = `
+    <div class="roadmap-dot"></div>
+    <div class="roadmap-label">${r.phase}</div>
+    <div class="roadmap-title">${r.title}</div>
+    <div class="roadmap-desc">${r.desc}</div>
+  `;
+  rm.appendChild(item);
+});
+
+// Tabs logic
+tabsEl.addEventListener('click', e=>{
+  if(!e.target.classList.contains('tab')) return;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  e.target.classList.add('active');
+  renderGrid(document.getElementById('search').value.trim(), e.target.dataset.cat);
+});
+
+// Search logic
+document.getElementById('search').addEventListener('input', e=>{
+  const v = e.target.value.toLowerCase();
+  const activeCat = document.querySelector('.tab.active').dataset.cat;
+  renderGrid(v, activeCat);
+  renderSignals(v);
+});
+
+// Init
+renderGrid();
+renderSignals();
+
+// Count stats
+const totalP = categories.reduce((a,c)=>a+c.patterns.length,0);
+const totalS = signals.length;
+let cp=0,cs=0;
+const pi = setInterval(()=>{ cp=Math.min(cp+3,totalP); document.getElementById('totalPatterns').textContent=cp; if(cp>=totalP)clearInterval(pi);},20);
+const si = setInterval(()=>{ cs=Math.min(cs+2,totalS); document.getElementById('totalSignals').textContent=cs; if(cs>=totalS)clearInterval(si);},25);
+
+
+
+//  ============================================================
+//      JAVASCRIPT — closing /script tag se PEHLE paste karo
+//      (yaani existing /script se pehle ye code daalo)
+//      ============================================================
+
+// ===== CP ADVANCED DATA =====
+const cpCategories = [
+  {
+    id: 'adv-graph', label: '🕸 Advanced Graph', icon: '🕸', color: '#06b6d4', diff: 'hard',
+    patterns: [
+      { name: "Dijkstra's (Priority Queue)", diff: 'medium', lc: 'https://leetcode.com/problems/network-delay-time/', gfg: 'https://www.geeksforgeeks.org/dijkstras-shortest-path-algorithm-greedy-algo-7/', cf: 'https://codeforces.com/problemset?tags=shortest+paths' },
+      { name: 'A* Search Algorithm', diff: 'hard', lc: 'https://leetcode.com/problems/sliding-puzzle/', gfg: 'https://www.geeksforgeeks.org/a-search-algorithm/', cf: 'https://codeforces.com/problemset?tags=graphs' },
+      { name: "Johnson's Algorithm", diff: 'expert', lc: 'https://leetcode.com/problems/find-the-city-with-the-smallest-number-of-neighbors-at-a-threshold-distance/', gfg: 'https://www.geeksforgeeks.org/johnsons-algorithm/', cf: 'https://codeforces.com/problemset?tags=shortest+paths' },
+      { name: "Dinic's Max Flow", diff: 'expert', lc: 'https://leetcode.com/problems/maximum-students-taking-exam/', gfg: 'https://www.geeksforgeeks.org/dinics-algorithm-maximum-flow/', cf: 'https://codeforces.com/problemset?tags=flows' },
+      { name: 'Edmonds-Karp (Max Flow)', diff: 'expert', lc: 'https://leetcode.com/problems/maximum-students-taking-exam/', gfg: 'https://www.geeksforgeeks.org/ford-fulkerson-algorithm-for-maximum-flow-problem/', cf: 'https://codeforces.com/problemset?tags=flows' },
+      { name: 'Hopcroft-Karp (Bipartite Matching)', diff: 'expert', lc: 'https://leetcode.com/problems/maximum-matching/', gfg: 'https://www.geeksforgeeks.org/hopcroft-karp-algorithm-for-maximum-matching/', cf: 'https://codeforces.com/problemset?tags=matching' },
+      { name: 'Eulerian Path / Circuit', diff: 'hard', lc: 'https://leetcode.com/problems/reconstruct-itinerary/', gfg: 'https://www.geeksforgeeks.org/eulerian-path-and-circuit/', cf: 'https://codeforces.com/problemset?tags=graphs' },
+      { name: 'Hamiltonian Path (Bitmask DP)', diff: 'expert', lc: 'https://leetcode.com/problems/shortest-path-visiting-all-nodes/', gfg: 'https://www.geeksforgeeks.org/hamiltonian-cycle-backtracking-6/', cf: 'https://codeforces.com/problemset?tags=dp,bitmasks' },
+      { name: 'Bridges & Articulation Points', diff: 'hard', lc: 'https://leetcode.com/problems/critical-connections-in-a-network/', gfg: 'https://www.geeksforgeeks.org/articulation-points-or-cut-vertices-in-a-graph/', cf: 'https://codeforces.com/problemset?tags=bridges,dfs+and+similar' },
+    ]
+  },
+  {
+    id: 'adv-tree', label: '🌲 Advanced Tree Structures', icon: '🌲', color: '#4ade80', diff: 'hard',
+    patterns: [
+      { name: 'AVL Tree', diff: 'hard', lc: 'https://leetcode.com/problems/balance-a-binary-search-tree/', gfg: 'https://www.geeksforgeeks.org/avl-tree-set-1-insertion/', cf: 'https://codeforces.com/problemset?tags=trees' },
+      { name: 'Red-Black Tree', diff: 'expert', lc: 'https://leetcode.com/problems/count-of-smaller-numbers-after-self/', gfg: 'https://www.geeksforgeeks.org/red-black-tree-set-1-introduction-2/', cf: 'https://codeforces.com/problemset?tags=trees' },
+      { name: 'B Tree / B+ Tree', diff: 'expert', lc: 'https://leetcode.com/problems/design-skiplist/', gfg: 'https://www.geeksforgeeks.org/introduction-of-b-tree/', cf: null },
+      { name: 'Binary Lifting (LCA O(logN))', diff: 'hard', lc: 'https://leetcode.com/problems/kth-ancestor-of-a-tree-node/', gfg: 'https://www.geeksforgeeks.org/lca-in-a-tree-using-binary-lifting-technique/', cf: 'https://codeforces.com/problemset?tags=trees,lca' },
+      { name: 'Heavy Light Decomposition', diff: 'expert', lc: 'https://leetcode.com/problems/sum-of-distances-in-tree/', gfg: 'https://www.geeksforgeeks.org/heavy-light-decomposition/', cf: 'https://codeforces.com/problemset?tags=trees,hld' },
+      { name: 'Centroid Decomposition', diff: 'expert', lc: 'https://leetcode.com/problems/count-pairs-of-nodes/', gfg: 'https://www.geeksforgeeks.org/centroid-decomposition-of-tree/', cf: 'https://codeforces.com/problemset?tags=trees,divide+and+conquer' },
+      { name: 'Euler Tour on Tree', diff: 'hard', lc: 'https://leetcode.com/problems/sum-of-distances-in-tree/', gfg: 'https://www.geeksforgeeks.org/euler-tour-tree/', cf: 'https://codeforces.com/problemset?tags=trees' },
+      { name: 'Persistent Segment Tree', diff: 'expert', lc: 'https://leetcode.com/problems/count-of-range-sum/', gfg: 'https://www.geeksforgeeks.org/persistent-segment-tree/', cf: 'https://codeforces.com/problemset?tags=data+structures' },
+    ]
+  },
+  {
+    id: 'adv-dp', label: '💎 Advanced DP Optimizations', icon: '💎', color: '#e879f9', diff: 'expert',
+    patterns: [
+      { name: 'Convex Hull Trick (CHT)', diff: 'expert', lc: 'https://leetcode.com/problems/minimum-cost-to-cut-a-stick/', gfg: 'https://www.geeksforgeeks.org/convex-hull-trick/', cf: 'https://codeforces.com/problemset?tags=dp,geometry' },
+      { name: 'Divide & Conquer DP Optimization', diff: 'expert', lc: 'https://leetcode.com/problems/burst-balloons/', gfg: 'https://www.geeksforgeeks.org/divide-and-conquer-optimization-dp/', cf: 'https://codeforces.com/problemset?tags=dp,divide+and+conquer' },
+      { name: 'Knuth Optimization', diff: 'expert', lc: 'https://leetcode.com/problems/strange-printer/', gfg: 'https://www.geeksforgeeks.org/knuths-optimization-in-dynamic-programming/', cf: 'https://codeforces.com/problemset?tags=dp' },
+      { name: 'SOS DP (Sum over Subsets)', diff: 'expert', lc: 'https://leetcode.com/problems/maximum-and-sum-of-array/', gfg: 'https://www.geeksforgeeks.org/sum-over-subsets-dynamic-programming/', cf: 'https://codeforces.com/problemset?tags=dp,bitmasks' },
+      { name: 'Probability DP', diff: 'hard', lc: 'https://leetcode.com/problems/soup-servings/', gfg: 'https://www.geeksforgeeks.org/probability-dp/', cf: 'https://codeforces.com/problemset?tags=dp,probabilities' },
+      { name: 'Profile DP (Broken Profile)', diff: 'expert', lc: 'https://leetcode.com/problems/domino-and-tromino-tiling/', gfg: 'https://www.geeksforgeeks.org/tiling-problem/', cf: 'https://codeforces.com/problemset?tags=dp,bitmasks' },
+      { name: 'Monotone Queue DP Optimization', diff: 'expert', lc: 'https://leetcode.com/problems/jump-game-vi/', gfg: 'https://www.geeksforgeeks.org/deque-set-1-introduction-applications/', cf: 'https://codeforces.com/problemset?tags=dp' },
+    ]
+  },
+  {
+    id: 'adv-string', label: '🔤 Advanced String', icon: '🔤', color: '#fbbf24', diff: 'hard',
+    patterns: [
+      { name: 'Suffix Array (SA-IS)', diff: 'hard', lc: 'https://leetcode.com/problems/longest-duplicate-substring/', gfg: 'https://www.geeksforgeeks.org/suffix-array-set-1-introduction/', cf: 'https://codeforces.com/problemset?tags=strings,suffix+array' },
+      { name: 'Suffix Automaton (SAM)', diff: 'expert', lc: 'https://leetcode.com/problems/distinct-echo-substrings/', gfg: 'https://www.geeksforgeeks.org/suffix-automaton/', cf: 'https://codeforces.com/problemset?tags=strings' },
+      { name: 'Aho-Corasick Algorithm', diff: 'hard', lc: 'https://leetcode.com/problems/word-break-ii/', gfg: 'https://www.geeksforgeeks.org/aho-corasick-algorithm-pattern-searching/', cf: 'https://codeforces.com/problemset?tags=strings,aho-corasick' },
+      { name: 'Palindromic Tree (Eertree)', diff: 'expert', lc: 'https://leetcode.com/problems/palindrome-pairs/', gfg: 'https://www.geeksforgeeks.org/palindromic-tree-introduction/', cf: 'https://codeforces.com/problemset?tags=strings' },
+      { name: 'Lyndon Factorization', diff: 'expert', lc: 'https://leetcode.com/problems/last-substring-in-lexicographical-order/', gfg: 'https://www.geeksforgeeks.org/duval-algorithm-finding-lexicographically-smallest-rotation/', cf: 'https://codeforces.com/problemset?tags=strings' },
+    ]
+  },
+  {
+    id: 'adv-math', label: '🔢 Number Theory', icon: '🔢', color: '#f43f5e', diff: 'hard',
+    patterns: [
+      { name: 'Extended Euclidean Algorithm', diff: 'medium', lc: 'https://leetcode.com/problems/x-of-a-kind-in-a-deck-of-cards/', gfg: 'https://www.geeksforgeeks.org/euclidean-algorithms-basic-and-extended/', cf: 'https://codeforces.com/problemset?tags=number+theory,math' },
+      { name: 'Modular Inverse (Fermat)', diff: 'medium', lc: 'https://leetcode.com/problems/combination/', gfg: 'https://www.geeksforgeeks.org/multiplicative-inverse-under-modulo-m/', cf: 'https://codeforces.com/problemset?tags=number+theory' },
+      { name: 'Chinese Remainder Theorem', diff: 'hard', lc: 'https://leetcode.com/problems/nth-magical-number/', gfg: 'https://www.geeksforgeeks.org/chinese-remainder-theorem-set-1-introduction/', cf: 'https://codeforces.com/problemset?tags=number+theory,crt' },
+      { name: 'Fast Modular Exponentiation', diff: 'medium', lc: 'https://leetcode.com/problems/powx-n/', gfg: 'https://www.geeksforgeeks.org/modular-exponentiation-power-in-modular-arithmetic/', cf: 'https://codeforces.com/problemset?tags=math' },
+      { name: 'Catalan Numbers', diff: 'hard', lc: 'https://leetcode.com/problems/unique-binary-search-trees/', gfg: 'https://www.geeksforgeeks.org/program-nth-catalan-number/', cf: 'https://codeforces.com/problemset?tags=combinatorics' },
+      { name: 'Linear Sieve (Multiplicative Functions)', diff: 'hard', lc: 'https://leetcode.com/problems/count-primes/', gfg: 'https://www.geeksforgeeks.org/segmented-sieve/', cf: 'https://codeforces.com/problemset?tags=number+theory' },
+      { name: 'FFT / NTT (Polynomial Multiply)', diff: 'expert', lc: 'https://leetcode.com/problems/multiply-strings/', gfg: 'https://www.geeksforgeeks.org/fast-fourier-transformation-poynomial-multiplication/', cf: 'https://codeforces.com/problemset?tags=fft' },
+    ]
+  },
+  {
+    id: 'game-geo', label: '🎮 Game Theory + Geometry', icon: '🎮', color: '#fb923c', diff: 'hard',
+    patterns: [
+      { name: 'Nim Game / Sprague-Grundy', diff: 'hard', lc: 'https://leetcode.com/problems/nim-game/', gfg: 'https://www.geeksforgeeks.org/combinatorial-game-theory-set-2-game-nim/', cf: 'https://codeforces.com/problemset?tags=games' },
+      { name: 'Grundy Numbers', diff: 'expert', lc: 'https://leetcode.com/problems/stone-game/', gfg: 'https://www.geeksforgeeks.org/grundy-numbers-or-nimbers/', cf: 'https://codeforces.com/problemset?tags=games' },
+      { name: 'Minimax + Alpha-Beta Pruning', diff: 'hard', lc: 'https://leetcode.com/problems/predict-the-winner/', gfg: 'https://www.geeksforgeeks.org/minimax-algorithm-in-game-theory-set-1-introduction/', cf: 'https://codeforces.com/problemset?tags=games' },
+      { name: 'Convex Hull (Graham Scan)', diff: 'hard', lc: 'https://leetcode.com/problems/erect-the-fence/', gfg: 'https://www.geeksforgeeks.org/convex-hull-set-2-graham-scan/', cf: 'https://codeforces.com/problemset?tags=geometry,convex+hull' },
+      { name: 'Closest Pair of Points', diff: 'hard', lc: 'https://leetcode.com/problems/minimum-time-visiting-all-points/', gfg: 'https://www.geeksforgeeks.org/closest-pair-of-points-using-divide-and-conquer-algorithm/', cf: 'https://codeforces.com/problemset?tags=geometry' },
+      { name: 'Line Sweep (Advanced)', diff: 'hard', lc: 'https://leetcode.com/problems/rectangle-area-ii/', gfg: 'https://www.geeksforgeeks.org/given-a-set-of-line-segments-find-if-any-two-segments-intersect/', cf: 'https://codeforces.com/problemset?tags=geometry,sweep+line' },
+    ]
+  }
+];
+
+const combos = [
+  {
+    title: 'Sliding Window + HashMap',
+    pills: ['Sliding Window', 'HashMap'],
+    example: 'Longest substring with at most K distinct characters',
+    lc: 'https://leetcode.com/problems/longest-substring-with-at-most-k-distinct-characters/',
+    gfg: 'https://www.geeksforgeeks.org/find-the-longest-substring-with-k-unique-characters-in-a-given-string/'
+  },
+  {
+    title: 'Binary Search + Greedy',
+    pills: ['Binary Search', 'Greedy'],
+    example: 'Minimize max distance, allocate books, aggressive cows',
+    lc: 'https://leetcode.com/problems/split-array-largest-sum/',
+    gfg: 'https://www.geeksforgeeks.org/allocate-minimum-number-of-pages/'
+  },
+  {
+    title: 'DFS + DP (Tree DP)',
+    pills: ['DFS', 'Dynamic Programming'],
+    example: 'Max path sum, house robber on tree, diameter',
+    lc: 'https://leetcode.com/problems/house-robber-iii/',
+    gfg: 'https://www.geeksforgeeks.org/dp-on-trees/'
+  },
+  {
+    title: 'Heap + Greedy',
+    pills: ['Heap', 'Greedy'],
+    example: 'Task scheduler, reorganize string, meeting rooms',
+    lc: 'https://leetcode.com/problems/task-scheduler/',
+    gfg: 'https://www.geeksforgeeks.org/task-scheduler/'
+  },
+  {
+    title: 'Backtracking + Bitmask',
+    pills: ['Backtracking', 'Bitmask DP'],
+    example: 'Shortest path visiting all nodes, TSP',
+    lc: 'https://leetcode.com/problems/shortest-path-visiting-all-nodes/',
+    gfg: 'https://www.geeksforgeeks.org/travelling-salesman-problem-using-dynamic-programming/'
+  },
+  {
+    title: 'Graph + DP',
+    pills: ['Graph', 'Dynamic Programming'],
+    example: 'Cheapest flights within K stops, dungeon game',
+    lc: 'https://leetcode.com/problems/cheapest-flights-within-k-stops/',
+    gfg: 'https://www.geeksforgeeks.org/dynamic-programming-on-graphs/'
+  },
+  {
+    title: 'Monotonic Stack + DP',
+    pills: ['Monotonic Stack', 'Dynamic Programming'],
+    example: 'Max sum rectangle, largest rectangle in buildings',
+    lc: 'https://leetcode.com/problems/maximum-sum-of-rectangle-no-larger-than-k/',
+    gfg: 'https://www.geeksforgeeks.org/maximum-size-rectangle-binary-sub-matrix-1s/'
+  },
+  {
+    title: 'Trie + DFS',
+    pills: ['Trie', 'DFS'],
+    example: 'Word search II, find all words on board',
+    lc: 'https://leetcode.com/problems/word-search-ii/',
+    gfg: 'https://www.geeksforgeeks.org/boggle-find-possible-words-board-characters/'
+  },
+  {
+    title: 'Union Find + Greedy',
+    pills: ['Union Find', 'Greedy'],
+    example: "Kruskal's MST, connecting cities with minimum cost",
+    lc: 'https://leetcode.com/problems/min-cost-to-connect-all-points/',
+    gfg: 'https://www.geeksforgeeks.org/kruskals-minimum-spanning-tree-algorithm-greedy-algo-2/'
+  },
+  {
+    title: 'Segment Tree + Lazy Propagation',
+    pills: ['Segment Tree', 'Lazy Propagation'],
+    example: 'Range update + range query, painting fence',
+    lc: 'https://leetcode.com/problems/range-sum-query-mutable/',
+    gfg: 'https://www.geeksforgeeks.org/lazy-propagation-in-segment-tree/'
+  },
+  {
+    title: 'BFS + DP',
+    pills: ['BFS', 'Dynamic Programming'],
+    example: 'Word ladder II, minimum steps with obstacles',
+    lc: 'https://leetcode.com/problems/word-ladder-ii/',
+    gfg: 'https://www.geeksforgeeks.org/shortest-path-unweighted-graph/'
+  },
+  {
+    title: 'Binary Search + DP',
+    pills: ['Binary Search', 'Dynamic Programming'],
+    example: 'LIS in O(N log N), patience sorting',
+    lc: 'https://leetcode.com/problems/longest-increasing-subsequence/',
+    gfg: 'https://www.geeksforgeeks.org/longest-monotonically-increasing-subsequence-size-n-log-n/'
+  },
+];
+
+// Render CP Cards
+function renderCPGrid(diffFilter='all') {
+  const grid = document.getElementById('cpGrid');
+  grid.innerHTML = '';
+  let total = 0;
+  cpCategories.forEach((cat, ci) => {
+    const filtered = diffFilter === 'all' ? cat.patterns : cat.patterns.filter(p => p.diff === diffFilter);
+    if(!filtered.length) return;
+    total += filtered.length;
+    const card = document.createElement('div');
+    card.className = 'cp-card';
+    card.style.animationDelay = ci * 0.06 + 's';
+    card.innerHTML = `
+      <div class="cp-card-header">
+        <div class="cp-card-icon" style="background:${cat.color}18;color:${cat.color}">${cat.icon}</div>
+        <div class="cp-card-title" style="color:${cat.color}">${cat.label.replace(/^[^ ]+ /, '')}</div>
+        <div class="cp-card-count">${filtered.length}</div>
+      </div>
+      <div class="patterns-list" id="cpList-${cat.id}"></div>
+    `;
+    grid.appendChild(card);
+    const list = card.querySelector(`#cpList-${cat.id}`);
+    filtered.forEach(p => {
+      const item = document.createElement('div');
+      item.className = 'cp-pattern-item';
+      const diffClass = p.diff === 'expert' ? 'diff-expert' : p.diff === 'hard' ? 'diff-hard' : 'diff-medium';
+      const diffLabel = p.diff === 'expert' ? '💀 Expert' : p.diff === 'hard' ? '🔴 Hard' : '🟡 Med-Hard';
+      item.innerHTML = `
+        <span class="cp-pattern-name">
+          ${p.name}
+          <span class="diff-badge ${diffClass}">${diffLabel}</span>
+        </span>
+        <div class="pattern-links">
+          <a class="link-btn lc" href="${p.lc}" target="_blank" rel="noopener">LC ↗</a>
+          <a class="link-btn gfg" href="${p.gfg}" target="_blank" rel="noopener">GFG ↗</a>
+          ${p.cf ? `<a class="link-btn cf" href="${p.cf}" target="_blank" rel="noopener">CF ↗</a>` : ''}
+        </div>
+      `;
+      list.appendChild(item);
+    });
+  });
+  return total;
+}
+
+// Render Combos
+function renderCombos() {
+  const grid = document.getElementById('comboGrid');
+  grid.innerHTML = '';
+  combos.forEach((c, i) => {
+    const card = document.createElement('div');
+    card.className = 'combo-card';
+    card.style.animationDelay = i * 0.04 + 's';
+    card.innerHTML = `
+      <div class="combo-title">⚡ ${c.title}</div>
+      <div class="combo-pills">${c.pills.map(p=>`<span class="combo-pill">${p}</span>`).join('')}</div>
+      <div class="combo-example">eg: "${c.example}"</div>
+      <div class="combo-links">
+        <a class="link-btn lc" href="${c.lc}" target="_blank" rel="noopener">LC Practice ↗</a>
+        <a class="link-btn gfg" href="${c.gfg}" target="_blank" rel="noopener">GFG ↗</a>
+      </div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// Filter buttons
+document.querySelectorAll('.cp-filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.cp-filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    renderCPGrid(btn.dataset.diff);
+  });
+});
+
+// Init CP Section
+renderCPGrid();
+renderCombos();
+
+// Animate counters
+const cpTotal = cpCategories.reduce((a,c)=>a+c.patterns.length,0);
+const comboTotal = combos.length;
+let c1=0, c2=0;
+const cpi = setInterval(()=>{ c1=Math.min(c1+2,cpTotal); document.getElementById('cpTotalPatterns').textContent=c1; if(c1>=cpTotal)clearInterval(cpi);},30);
+const cpc = setInterval(()=>{ c2=Math.min(c2+1,comboTotal); document.getElementById('cpTotalCombos').textContent=c2; if(c2>=comboTotal)clearInterval(cpc);},50);
+
+
+document.addEventListener('contextmenu', e => e.preventDefault());
+  document.addEventListener('keydown', e => {
+    if(e.key === 'F12') e.preventDefault();
+    if(e.ctrlKey && e.key === 'u') e.preventDefault();
+    if(e.ctrlKey && e.shiftKey && e.key === 'I') e.preventDefault();
+  });
+</script>
+</body>
+</html>
