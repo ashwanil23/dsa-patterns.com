@@ -11,11 +11,11 @@
 
 <br/><br/>
 
-[![Live Demo](https://img.shields.io/badge/🌐_LIVE_DEMO-Visit_Website-00ff88?style=for-the-badge&logoColor=white)](https://ashwanil23.github.io/dsa-patterns/)
+[![Live Demo](https://img.shields.io/badge/🌐_LIVE_DEMO-Visit_Website-00ff88?style=for-the-badge&logoColor=white)](https://ashwanil23.github.io/dsa-patterns.com/)
 &nbsp;
-[![Stars](https://img.shields.io/github/stars/ashwanil23/dsa-patterns?style=for-the-badge&color=00ff88&logo=github)](https://github.com/ashwanil23/dsa-patterns/stargazers)
+[![Stars](https://img.shields.io/github/stars/ashwanil23/dsa-patterns?style=for-the-badge&color=00ff88&logo=github)](https://github.com/ashwanil23/dsa-patterns.com/stargazers)
 &nbsp;
-[![Forks](https://img.shields.io/github/forks/ashwanil23/dsa-patterns?style=for-the-badge&color=7c3aed&logo=github)](https://github.com/ashwanil23/dsa-patterns/network/members)
+[![Forks](https://img.shields.io/github/forks/ashwanil23/dsa-patterns?style=for-the-badge&color=7c3aed&logo=github)](https://github.com/ashwanil23/dsa-patterns.com/forks)
 &nbsp;
 [![License](https://img.shields.io/badge/License-MIT-ff6b35?style=for-the-badge)](LICENSE)
 
